@@ -27,6 +27,10 @@ class MovieHall(private val shows: Collection<Show>) {
     fun totalReservedTicketsFor(showTime: ShowTime, showDate: LocalDate): Int {
         return showsForToday.first { it.showTime == showTime && it.showDate == showDate }.numberOfSeats
     }
+
+    fun getMovieNameForAShow(showTime: ShowTime,showDate: LocalDate):String? {
+        return showsForToday.first { it.showTime == showTime && it.showDate == showDate }.movieName
+    }
 }
 
 

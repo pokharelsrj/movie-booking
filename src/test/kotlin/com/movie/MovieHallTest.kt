@@ -9,9 +9,9 @@ class MovieHallTest : StringSpec() {
     init {
         "should reserve ticket for a show" {
             val showsForToday = listOf(
-                Show(100, ShowTime.MORNING, LocalDate.of(2021, 8, 19)),
-                Show(100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 19)),
-                Show(100, ShowTime.EVENING, LocalDate.of(2021, 8, 19))
+                Show(100,100, ShowTime.MORNING, LocalDate.of(2021, 8, 19),"ABCD"),
+                Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 19),"ABCD"),
+                Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 19),"ABCD")
             )
 
             val movieHall = MovieHall(showsForToday)
@@ -25,9 +25,9 @@ class MovieHallTest : StringSpec() {
 
         "should reserve two tickets for a show" {
             val showsForToday = listOf(
-                Show(100, ShowTime.MORNING, LocalDate.of(2021, 8, 19)),
-                Show(100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 19)),
-                Show(100, ShowTime.EVENING, LocalDate.of(2021, 8, 19))
+                Show(100,100, ShowTime.MORNING, LocalDate.of(2021, 8, 19),"ABCD"),
+                Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 19),"ABCD"),
+                Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 19),"ABCD")
             )
 
             val movieHall = MovieHall(showsForToday)
@@ -43,9 +43,9 @@ class MovieHallTest : StringSpec() {
 
         "should return error if all the tickets are sold out for a show" {
             val showsForToday = listOf(
-                Show(1, ShowTime.MORNING, LocalDate.of(2021, 8, 21)),
-                Show(100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21)),
-                Show(100, ShowTime.EVENING, LocalDate.of(2021, 8, 21))
+                Show(100,1, ShowTime.MORNING, LocalDate.of(2021, 8, 21),"ABCD"),
+                Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21),"ABCD"),
+                Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 21),"ABCD")
             )
             val exception = shouldThrow<IllegalStateException> {
                 val movieHall = MovieHall(showsForToday)
@@ -58,7 +58,7 @@ class MovieHallTest : StringSpec() {
 
         "should return error if a show is not defined and it's information is accessed" {
             val showsForToday = listOf(
-                Show(100, ShowTime.MORNING, LocalDate.of(2021, 8, 21)),
+                Show(100,100, ShowTime.MORNING, LocalDate.of(2021, 8, 21),"ABCD"),
             )
             val movieHall = MovieHall(showsForToday)
             val (newBookMyShowState, ticket) = movieHall.reserve(ShowTime.MORNING, LocalDate.of(2021, 8, 21))
@@ -74,9 +74,9 @@ class MovieHallTest : StringSpec() {
         "should return error if a show is defined for after 7 days from the current date" {
             val exception = shouldThrow<IllegalStateException> {
                 val showsForToday = listOf(
-                    Show(1, ShowTime.MORNING, LocalDate.of(2021, 8, 29)),
-                    Show(100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21)),
-                    Show(100, ShowTime.EVENING, LocalDate.of(2021, 8, 21))
+                    Show(100,1, ShowTime.MORNING, LocalDate.of(2021, 8, 29),"ABCD"),
+                    Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21),"ABCD"),
+                    Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 21),"ABCD")
                 )
                 MovieHall(showsForToday)
             }
@@ -87,14 +87,29 @@ class MovieHallTest : StringSpec() {
         "should return error if a show is defined before the current date" {
             val exception = shouldThrow<IllegalStateException> {
                 val showsForToday = listOf(
-                    Show(1, ShowTime.MORNING, LocalDate.of(2021, 8, 16)),
-                    Show(100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21)),
-                    Show(100, ShowTime.EVENING, LocalDate.of(2021, 8, 21))
+                    Show(100,1, ShowTime.MORNING, LocalDate.of(2021, 8, 16),"ABCD"),
+                    Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 21),"ABCD"),
+                    Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 21),"ABCD")
                 )
                 MovieHall(showsForToday)
             }
 
             exception.message shouldBe "Show not available for date: 2021-08-16"
+        }
+
+        "should return name of the movie for a particular show" {
+            val showsForToday = listOf(
+                Show(100,100, ShowTime.MORNING, LocalDate.of(2021, 8, 19),"ABCD"),
+                Show(100,100, ShowTime.AFTERNOON, LocalDate.of(2021, 8, 19),"ABCD2"),
+                Show(100,100, ShowTime.EVENING, LocalDate.of(2021, 8, 19),"ABCD3")
+            )
+
+            val movieHall = MovieHall(showsForToday)
+            val (newBookMyShowState,_) = movieHall.reserve(ShowTime.MORNING, LocalDate.of(2021, 8, 19))
+
+            newBookMyShowState.getMovieNameForAShow(ShowTime.MORNING,LocalDate.of(2021, 8, 19)) shouldBe "ABCD"
+            newBookMyShowState.getMovieNameForAShow(ShowTime.AFTERNOON,LocalDate.of(2021, 8, 19)) shouldBe "ABCD2"
+            newBookMyShowState.getMovieNameForAShow(ShowTime.EVENING,LocalDate.of(2021, 8, 19)) shouldBe "ABCD3"
         }
     }
 }
